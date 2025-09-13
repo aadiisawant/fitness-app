@@ -19,7 +19,7 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(registerRequest));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/getUser/{userId}")
     public ResponseEntity<UserResponse> getUser(@PathVariable String userId){
         return ResponseEntity.ok(userService.getUserProfile(userId));
     }
