@@ -5,14 +5,37 @@ import com.fitness.activityservice.dto.ActivityResponse;
 import com.fitness.activityservice.model.Activity;
 import com.fitness.activityservice.repo.ActivityRepo;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 public class ActivityService {
 
-    private ActivityRepo activityRepo;
+    private final ActivityRepo activityRepo;
+
+    private final UserValidationService validationService;
+
+    private final KafkaTemplate<String, Activity> activityKafkaTemplate;
+
+    @Value("${kafka.topic.name}")
+    private String topicName;
     public ActivityResponse trackActivity(ActivityRequest activityRequest) {
+        log.info("User Validation Processing....", activityRequest.getUserId());
+        boolean isValid = validationService.validateUser(activityRequest.getUserId());
+
+        if(!isValid){
+            log.error("User Not Found.");
+            throw new RuntimeException("Invalid User: "+activityRequest.getUserId());
+        }
+
         Activity activity = Activity.builder()
                 .userId(activityRequest.getUserId())
                 .type(activityRequest.getType())
@@ -23,7 +46,13 @@ public class ActivityService {
                 .build();
         Activity savedActivity = activityRepo.save(activity);
 
+        try{
+            activityKafkaTemplate.send(topicName, savedActivity.getUserId(), savedActivity);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return mapToResponse(savedActivity);
+
     }
 
     private ActivityResponse mapToResponse(Activity activity) {
@@ -40,8 +69,10 @@ public class ActivityService {
         return res;
     }
 
-    public ActivityResponse getActivity(String userId) {
-        Activity activity = activityRepo.findByUserId(userId);
-        return mapToResponse(activity);
+    public List<ActivityResponse> getActivity(String userId) {
+        List<Activity> activityList = activityRepo.findByUserId(userId);
+        return activityList.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 }
