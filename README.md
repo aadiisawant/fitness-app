@@ -1,1 +1,1 @@
-# fitness-app
+# FITNESS APP WITH AI RECOMMENDATIONS
