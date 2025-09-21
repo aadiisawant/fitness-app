@@ -4,7 +4,6 @@ import com.fitness.activityservice.dto.ActivityRequest;
 import com.fitness.activityservice.dto.ActivityResponse;
 import com.fitness.activityservice.model.Activity;
 import com.fitness.activityservice.repo.ActivityRepo;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +46,7 @@ public class ActivityService {
         Activity savedActivity = activityRepo.save(activity);
 
         try{
+            log.info("sending activity to aiservice....");
             activityKafkaTemplate.send(topicName, savedActivity.getUserId(), savedActivity);
         }catch (Exception e){
             e.printStackTrace();
