@@ -4,10 +4,12 @@ import com.fitness.userservice.dto.RegisterRequest;
 import com.fitness.userservice.dto.UserResponse;
 import com.fitness.userservice.models.User;
 import com.fitness.userservice.repo.UserRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class UserService {
 
     @Autowired
@@ -36,8 +38,10 @@ public class UserService {
     }
 
     public UserResponse getUserProfile(String userId) {
+        log.info("Finding user by ID....");
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User Not found!"));
+        log.info("user found.");
         UserResponse userResponse = new UserResponse();
         userResponse.setEmail(user.getEmail());
         userResponse.setFirstName(user.getFirstName());
@@ -49,6 +53,6 @@ public class UserService {
     }
 
     public Boolean existByUserId(String userId) {
-        return userRepo.existsById(userId);
+        return userRepo.existsByKeyCloakId(userId);
     }
 }
