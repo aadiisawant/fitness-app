@@ -10,15 +10,29 @@ import java.util.Map;
 @Service
 //@RequiredArgsConstructor
 public class GeminiService {
+//    private final WebClient webClient;
+
+//    @Value("${gemini.api.url}")
+//    private String geminiAPIUrl;
+//    @Value("${gemini.api.key}")
+//    private String geminiAPIKey;
+
+//    public GeminiService(WebClient.Builder webClientbuilder){
+//        this.webClient = webClientbuilder.build();
+//    }
+
     private final WebClient webClient;
+    private final String geminiAPIUrl;
+    private final String geminiAPIKey;
 
-    @Value("${gemini.api.url}")
-    private String geminiAPIUrl;
-    @Value("${gemini.api.key}")
-    private String geminiAPIKey;
-
-    public GeminiService(WebClient.Builder webClientbuilder){
-        this.webClient = webClientbuilder.build();
+    public GeminiService(
+            WebClient.Builder webClientBuilder,
+            @Value("${gemini.api.url}") String geminiAPIUrl,
+            @Value("${gemini.api.key}") String geminiAPIKey
+    ) {
+        this.webClient = webClientBuilder.build();
+        this.geminiAPIUrl = geminiAPIUrl;
+        this.geminiAPIKey = geminiAPIKey;
     }
 
     public String getRecommendations(String details){
