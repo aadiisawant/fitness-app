@@ -4,11 +4,13 @@ import com.fitness.userservice.dto.RegisterRequest;
 import com.fitness.userservice.dto.UserResponse;
 import com.fitness.userservice.services.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Slf4j
 @RequestMapping("/users")
 public class UserController {
 
@@ -26,6 +28,7 @@ public class UserController {
 
     @GetMapping("/validate/{userId}")
     public ResponseEntity<Boolean> validateUser(@PathVariable String userId){
+        log.info("Resquest for validating the user id: {}",userId);
         return ResponseEntity.ok(userService.existByUserId(userId));
     }
 }
