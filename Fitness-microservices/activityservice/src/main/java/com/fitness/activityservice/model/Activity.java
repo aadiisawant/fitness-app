@@ -19,6 +19,7 @@ public class Activity{
 
     private String id;
     private String userId;
+    private String keyCloakId;
     private ActivityType type;
     private Integer duration;
     private Integer caloriesBurned;

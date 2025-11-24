@@ -1,6 +1,8 @@
 package com.fitness.aiservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -8,22 +10,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Map;
 
 @Service
-//@RequiredArgsConstructor
+@Slf4j
 public class GeminiService {
-//    private final WebClient webClient;
-
-//    @Value("${gemini.api.url}")
-//    private String geminiAPIUrl;
-//    @Value("${gemini.api.key}")
-//    private String geminiAPIKey;
-
-//    public GeminiService(WebClient.Builder webClientbuilder){
-//        this.webClient = webClientbuilder.build();
-//    }
 
     private final WebClient webClient;
     private final String geminiAPIUrl;
     private final String geminiAPIKey;
+
 
     public GeminiService(
             WebClient.Builder webClientBuilder,
@@ -33,17 +26,20 @@ public class GeminiService {
         this.webClient = webClientBuilder.build();
         this.geminiAPIUrl = geminiAPIUrl;
         this.geminiAPIKey = geminiAPIKey;
+        log.info("Inside Gemini constructor, Url:{}, key:{}", geminiAPIUrl, geminiAPIKey);
     }
 
-    public String getRecommendations(String details){
+    public String getRecommendations(String details) {
+
         Map<String, Object> requestBody = Map.of(
                 "contents", new Object[]{
                         Map.of("parts", new Object[]{
-                                 Map.of("text",details)
+                                Map.of("text", details)
                         })
                 }
         );
-        String response = webClient.post()
+
+        return webClient.post()
                 .uri(geminiAPIUrl)
                 .header("Content-Type", "application/json")
                 .header("X-goog-api-key", geminiAPIKey)
@@ -51,6 +47,5 @@ public class GeminiService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-        return response;
     }
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 @Data
 public class ActivityResponse {
     private String userId;
+    private String keyCloakId;
     private ActivityType type;
     private Integer duration;
     private Integer caloriesBurned;

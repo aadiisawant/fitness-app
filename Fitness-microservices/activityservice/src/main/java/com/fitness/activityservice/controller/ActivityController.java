@@ -18,13 +18,14 @@ public class ActivityController {
     private ActivityService activityService;
 
     @PostMapping()
-    public ResponseEntity<ActivityResponse> trackActivity(@RequestBody ActivityRequest activityRequest){
+    public ResponseEntity<ActivityResponse> trackActivity(@RequestBody ActivityRequest activityRequest,  @RequestHeader("X-User-ID") String userId){
         log.info("In Activity Controller....");
+        activityRequest.setKeyCloakId(userId);
         return ResponseEntity.ok(activityService.trackActivity(activityRequest));
     }
 
     @GetMapping("/get/{userId}")
-    public ResponseEntity<List<ActivityResponse>> getActivityByUserId(@PathVariable String userId){
+    public ResponseEntity<List<ActivityResponse>> getActivityByUserId(@RequestHeader("X-User-ID") String userId){
         return ResponseEntity.ok(activityService.getActivity(userId));
     }
 

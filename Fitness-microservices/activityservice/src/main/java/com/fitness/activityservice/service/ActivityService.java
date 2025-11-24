@@ -27,16 +27,16 @@ public class ActivityService {
     @Value("${kafka.topic.name}")
     private String topicName;
     public ActivityResponse trackActivity(ActivityRequest activityRequest) {
-        log.info("User Validation Processing....", activityRequest.getUserId());
-        boolean isValid = validationService.validateUser(activityRequest.getUserId());
-
-        if(!isValid){
-            log.error("User Not Found.");
-            throw new RuntimeException("Invalid User: "+activityRequest.getUserId());
-        }
+//        boolean isValid = validationService.validateUser(activityRequest.getUserId());
+//
+//        if(!isValid){
+//            log.error("User Not Found.");
+//            throw new RuntimeException("Invalid User: "+activityRequest.getUserId());
+//        }
 
         Activity activity = Activity.builder()
                 .userId(activityRequest.getUserId())
+                .keyCloakId(activityRequest.getKeyCloakId())
                 .type(activityRequest.getType())
                 .duration(activityRequest.getDuration())
                 .caloriesBurned(activityRequest.getCaloriesBurned())
@@ -47,7 +47,7 @@ public class ActivityService {
 
         try{
             log.info("sending activity to aiservice....");
-            activityKafkaTemplate.send(topicName, savedActivity.getUserId(), savedActivity);
+            activityKafkaTemplate.send(topicName, savedActivity.getKeyCloakId(), savedActivity);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -58,6 +58,7 @@ public class ActivityService {
     private ActivityResponse mapToResponse(Activity activity) {
         ActivityResponse res = new ActivityResponse();
         res.setUserId(activity.getUserId());
+        res.setKeyCloakId(activity.getKeyCloakId());
         res.setType(activity.getType());
         res.setDuration(activity.getDuration());
         res.setCaloriesBurned(activity.getCaloriesBurned());
@@ -70,7 +71,8 @@ public class ActivityService {
     }
 
     public List<ActivityResponse> getActivity(String userId) {
-        List<Activity> activityList = activityRepo.findByUserId(userId);
+        log.info("Getting Activities of userId:{}", userId);
+        List<Activity> activityList = activityRepo.findByKeyCloakId();
         return activityList.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
