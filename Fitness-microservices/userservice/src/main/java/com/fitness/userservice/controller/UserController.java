@@ -1,6 +1,7 @@
 package com.fitness.userservice.controller;
 
 import com.fitness.userservice.dto.RegisterRequest;
+import com.fitness.userservice.dto.UserDetailsRequest;
 import com.fitness.userservice.dto.UserResponse;
 import com.fitness.userservice.services.UserService;
 import jakarta.validation.Valid;
@@ -19,6 +20,17 @@ public class UserController {
     @PostMapping("/register-user")
     public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest){
         return ResponseEntity.ok(userService.createUser(registerRequest));
+    }
+
+    @PostMapping("/profile")
+    public ResponseEntity<UserResponse> updateUserDetails(@RequestHeader("X-User-ID") String keycloakId, @RequestBody UserDetailsRequest request) {
+        log.info("updating user profile...");
+        return ResponseEntity.ok(userService.updateUserProfile(keycloakId, request));
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<UserResponse> getHealthReport(@RequestHeader("X-User-ID") String keycloakId) {
+        return ResponseEntity.ok(userService.getHealthReport(keycloakId));
     }
 
     @GetMapping("/getUser/{userId}")
